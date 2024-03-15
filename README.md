@@ -19,4 +19,4 @@ There are 10240 instances, each with features-
 3. **Text_tag-** Various tags given to the text, based on the type of content in the raw text.
 
 ### test.csv
-There are 1267 instances here, with 2 features- the raw and text, and the tags for the text.
+There are 1267 instances here, with 2 features- the raw text, and the tags for the text.
