@@ -6,7 +6,7 @@ We got our data from Kaggle, at https://www.kaggle.com/datasets/anmolkumar/fake-
 
 The data's format is as follows-
 
-### train.csv
+### projdataset.csv
 There are 10240 instances, each with features-
 1. **Labels-** The target variable we are trying to predict. This is a variable to indicate the degree of factuality of the text. The possible values are-
      - 0: Barely True
@@ -17,6 +17,3 @@ There are 10240 instances, each with features-
      - 5: True
 2. **Text-** The raw text.
 3. **Text_tag-** Various tags given to the text, based on the type of content in the raw text.
-
-### test.csv
-There are 1267 instances here, with 2 features- the raw text, and the tags for the text.
