@@ -8,8 +8,10 @@ from wordcloud import WordCloud
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
+from nltk.corpus import stopwords
+import nltk
 
-data = pd.read_csv("train.csv")
+data = pd.read_csv("Projdataset.csv")
 data.dropna(inplace=True)
 
 def tokenize_and_stem(text):
@@ -43,18 +45,25 @@ plt.show()
 X = data.drop(columns=['Labels'])  
 y = data['Labels']
 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
 vectorizer = CountVectorizer(tokenizer=lambda x: x, preprocessor=lambda x: x)
 X = vectorizer.fit_transform(data['Text_tokens'])
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-
 word_freq = pd.DataFrame(X.toarray(), columns=vectorizer.get_feature_names_out())
-word_freq_sum = word_freq.sum(axis=0).sort_values(ascending=False)[:20]
+
+stop_words = set(stopwords.words('english'))
+filtered_words = [word for word in word_freq.columns if word not in stop_words]
+
+word_freq_filtered = word_freq[filtered_words]
+
+word_freq_sum = word_freq_filtered.sum(axis=0).sort_values(ascending=False)[:20]
 plt.figure(figsize=(10, 6))
-sns.barplot(x=word_freq_sum.values, y=word_freq_sum.index)
-plt.title('Top 20 Most Frequent Words')
+sns.barplot(x=word_freq_sum.values, y=word_freq_sum.index, palette='inferno')
+plt.title('Top 20 Most Frequent Words (Excluding Stopwords)')
 plt.xlabel('Frequency')
 plt.ylabel('Word')
 plt.show()
+
 print("Train set shape:", X_train.shape, y_train.shape)
 print("Test set shape:", X_test.shape, y_test.shape)
