@@ -14,10 +14,12 @@ import nltk
 data = pd.read_csv("Projdataset.csv")
 data.dropna(inplace=True)
 
+stop_words = set(stopwords.words('english'))
+
 def tokenize_and_stem(text):
     text = re.sub(r'[^\w\s]', '', text)  
     tokens = re.findall(r'\b\w+\b', text)  
-    tokens = [word.lower() for word in tokens]  
+    tokens = [word.lower() for word in tokens if word.lower() not in stop_words]  
     return tokens
 
 data['Text_tokens'] = data['Text'].apply(tokenize_and_stem)
@@ -52,12 +54,7 @@ X = vectorizer.fit_transform(data['Text_tokens'])
 
 word_freq = pd.DataFrame(X.toarray(), columns=vectorizer.get_feature_names_out())
 
-stop_words = set(stopwords.words('english'))
-filtered_words = [word for word in word_freq.columns if word not in stop_words]
-
-word_freq_filtered = word_freq[filtered_words]
-
-word_freq_sum = word_freq_filtered.sum(axis=0).sort_values(ascending=False)[:20]
+word_freq_sum = word_freq.sum(axis=0).sort_values(ascending=False)[:20]
 plt.figure(figsize=(10, 6))
 sns.barplot(x=word_freq_sum.values, y=word_freq_sum.index, palette='inferno')
 plt.title('Top 20 Most Frequent Words (Excluding Stopwords)')
