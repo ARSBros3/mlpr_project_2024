@@ -5,28 +5,33 @@ import gensim
 from gensim.models import Word2Vec
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
-import seaborn as sns
 from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import CountVectorizer
 from nltk.corpus import stopwords
 import nltk
+import keras
+nltk.download('wordnet')
+
 
 data = pd.read_csv("Projdataset.csv")
 data.dropna(inplace=True)
 
+#processing data so that the tags are now a list of tags, ready for further preprocessing
+data['Text_Tag'] = data['Text_Tag'].str.replace('_', ' ')
+data['Text_Tag'] = data['Text_Tag'].str.split(',')
+
 stop_words = set(stopwords.words('english'))
 
 def tokenize_and_stem(text):
-    text = re.sub(r'[^\w\s]', '', text)  
-    tokens = re.findall(r'\b\w+\b', text)  
-    tokens = [word.lower() for word in tokens if word.lower() not in stop_words]  
+    text = re.sub(r'[^\w\s]', '', text)   #remove non-alphanumeric characters
+    text = text.lower() #lowercase
+    tokens = nltk.word_tokenize(text)
+    tokens = [token for token in tokens if token not in stop_words] #tokenise and remove stopwords
+    lemmatizer = nltk.stem.WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(token) for token in tokens] #lemmatise
     return tokens
 
 data['Text_tokens'] = data['Text'].apply(tokenize_and_stem)
-data['Text_Tag_tokens'] = data['Text_Tag'].apply(tokenize_and_stem)
-
-word2vec_model = Word2Vec(sentences=data['Text_tokens'].tolist() + data['Text_Tag_tokens'].tolist(), 
-                          vector_size=100, window=5, min_count=1, workers=4)
+data['Text_Tag_tokens'] = data['Text_Tag'].apply(lambda tags: [tokenize_and_stem(tag) for tag in tags])
 
 words_text = " ".join([word for word_list in data["Text_tokens"] for word in word_list])
 word_cloud_text = WordCloud(width=1200, height=600).generate(words_text)
@@ -36,7 +41,7 @@ plt.title("Words - Text")
 plt.axis("off")
 plt.show()
 
-words_tags = " ".join([word for word_list in data["Text_Tag_tokens"] for word in word_list])
+words_tags = " ".join([tag for tag_list in data["Text_Tag_tokens"] for each_tag in tag_list for tag in each_tag])
 word_cloud_tags = WordCloud(width=1200, height=600).generate(words_tags)
 plt.figure(figsize=(20, 10))
 plt.imshow(word_cloud_tags)
@@ -44,11 +49,24 @@ plt.title("Words - Text_Tag")
 plt.axis("off")
 plt.show()
 
-X = data.drop(columns=['Labels'])  
-y = data['Labels']
+embedding_model = Word2Vec(sentences=data['Text_tokens'], vector_size=100, window=5, min_count=1, workers=4)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+def embed_words(text_tokens, embedding_model): #embedding words using word2vec
+    embedded_words = []
+    for tokens in text_tokens:
+        embedded_tokens = []
+        for token in tokens:
+            if token in embedding_model.wv:
+                embedded_tokens.append(embedding_model.wv[token])
+        embedded_words.append(embedded_tokens)
+    return embedded_words
 
+data["embedded_text"] = embed_words(data['Text_tokens'], embedding_model)
+
+x_train, x_test, y_train, y_test = train_test_split(data['embedded_text'], data['Labels']) #train test split
+
+model = keras.Sequential() #building the model
+'''
 vectorizer = CountVectorizer(tokenizer=lambda x: x, preprocessor=lambda x: x)
 X = vectorizer.fit_transform(data['Text_tokens'])
 
@@ -64,3 +82,4 @@ plt.show()
 
 print("Train set shape:", X_train.shape, y_train.shape)
 print("Test set shape:", X_test.shape, y_test.shape)
+'''
