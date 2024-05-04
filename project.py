@@ -12,8 +12,7 @@ import keras
 from sklearn.feature_extraction.text import CountVectorizer
 import seaborn as sns
 
-nltk.download('wordnet')
-
+nltk.download('wordnet') #for lemmatizer
 
 data = pd.read_csv("Projdataset.csv")
 data.dropna(inplace=True)
@@ -52,7 +51,9 @@ plt.title("Words - Text_Tag")
 plt.axis("off")
 plt.show()
 
-embedding_model = Word2Vec(sentences=data['Text_tokens'], vector_size=100, window=5, min_count=1, workers=4)
+vec_size = 100 #we will embed words into a 100-dimensional vector space.
+
+embedding_model = Word2Vec(sentences=data['Text_tokens'], vector_size=vec_size, window=5, min_count=1, workers=4)
 
 def embed_words(text_tokens, embedding_model): #embedding words using word2vec
     embedded_words = []
@@ -66,10 +67,15 @@ def embed_words(text_tokens, embedding_model): #embedding words using word2vec
 
 data["embedded_text"] = embed_words(data['Text_tokens'], embedding_model)
 
+text_token_lengths = data['Text_tokens'].apply(len)
+plt.figure(figsize=(10, 6))
+sns.scatterplot(text_token_lengths.value_counts())
+plt.title('Distribution of Text Token Lengths')
+plt.xlabel('Token Length')
+plt.ylabel('Frequency')
+plt.show()
+
 x_train, x_test, y_train, y_test = train_test_split(data['embedded_text'], data['Labels']) #train test split
-
-model = keras.Sequential() #building the model
-
 
 vectorizer = CountVectorizer(tokenizer=lambda x: x, preprocessor=lambda x: x)
 X = vectorizer.fit_transform(data['Text_tokens'])
@@ -86,3 +92,4 @@ plt.show()
 
 print("Test shape:", x_test.shape, y_test.shape)
 print("Train set shape:", x_train.shape, y_train.shape)
+
