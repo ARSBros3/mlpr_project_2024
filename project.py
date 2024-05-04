@@ -9,6 +9,9 @@ from sklearn.model_selection import train_test_split
 from nltk.corpus import stopwords
 import nltk
 import keras
+from sklearn.feature_extraction.text import CountVectorizer
+import seaborn as sns
+
 nltk.download('wordnet')
 
 
@@ -66,7 +69,8 @@ data["embedded_text"] = embed_words(data['Text_tokens'], embedding_model)
 x_train, x_test, y_train, y_test = train_test_split(data['embedded_text'], data['Labels']) #train test split
 
 model = keras.Sequential() #building the model
-'''
+
+
 vectorizer = CountVectorizer(tokenizer=lambda x: x, preprocessor=lambda x: x)
 X = vectorizer.fit_transform(data['Text_tokens'])
 
@@ -80,6 +84,5 @@ plt.xlabel('Frequency')
 plt.ylabel('Word')
 plt.show()
 
-print("Train set shape:", X_train.shape, y_train.shape)
-print("Test set shape:", X_test.shape, y_test.shape)
-'''
+print("Test shape:", x_test.shape, y_test.shape)
+print("Train set shape:", x_train.shape, y_train.shape)
