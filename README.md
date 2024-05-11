@@ -1,19 +1,14 @@
 # mlpr_project_2024
-Our MLPR project on detecting the degree of factuality of news. Focusing on text.
+Our MLPR project on detecting the degree of factuality of news. Focusing on just the statement made.
 
 ## Our data
-We got our data from Kaggle, at https://www.kaggle.com/datasets/anmolkumar/fake-news-content-detection/
+We got our data from the LIAR database, link- https://paperswithcode.com/dataset/liar
 
-The data's format is as follows-
+The data's labels is as follows-
 
-### projdataset.csv
-There are 10240 instances, each with features-
-1. **Labels-** The target variable we are trying to predict. This is a variable to indicate the degree of factuality of the text. The possible values are-
-     - 0: Barely True
-     - 1: False
-     - 2: Half-True
-     - 3: Mostly True
-     - 4: Not Known
-     - 5: True
-2. **Text-** The raw text.
-3. **Text_tag-** Various tags given to the text, based on the type of content in the raw text.
+0: half-true
+1: false
+2: mostly-true
+3: true
+4: barely-true
+5: pants-fire (liar liar, pants on fire!)
