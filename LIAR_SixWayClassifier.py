@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Input, Masking, Bidirectional, LSTM, Dense, Dropout, BatchNormalization, Embedding
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping
-from keras import activations, regularizers, optimizers, losses, metrics
 
 #metrics for model evaluation
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
@@ -27,15 +26,15 @@ model.add(Bidirectional(LSTM(192, kernel_regularizer='l2', dropout=0.5, recurren
 
 model.add(Dense(64, activation='tanh')) #feature selection layer- could be a positive or negative sentiment, so went with tanh
 
-model.add(Dropout(0.5)) #dropout to prevent overfitting
-
 model.add(BatchNormalization()) #speed!
+
+model.add(Dropout(0.5)) #dropout to prevent overfitting
 
 model.add(Dense(32, activation='tanh')) #same logic, narrowing down the features
 
-model.add(Dropout(0.5)) #dropout to prevent overfitting
-
 model.add(BatchNormalization()) #speed!
+
+model.add(Dropout(0.5)) #dropout to prevent overfitting
 
 model.add(Dense(6, activation='softmax')) #output layer- 6 classes, so softmax activation to ensure the output adds up to 1 (like probabilities)
 
